@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Control - Gestão de Impressão 3D</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        shopee: '#EE4D2D',
+                        ml: '#FFE600',
+                        site: '#2563EB',
+                        wts: '#25D366'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .kanban-column {
+            min-height: calc(100vh - 220px);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- TELA DE LOGIN -->
+    <div id="screen-login" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
+        <div class="w-full max-w-md p-8 rounded-3xl glass-card shadow-2xl border border-slate-800 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 mb-2">
+                    <span class="text-3xl">🖨️</span>
+                </div>
+                <h1 class="text-2xl font-black text-white tracking-tight">3D Control</h1>
+                <p class="text-xs text-slate-400">Gerenciador do Empreendimento 3D</p>
+            </div>
+
+            <div class="space-y-4">
+                <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold text-center"></div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">E-mail de Acesso</label>
+                    <input type="email" id="login-email" placeholder="seuemail@exemplo.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Senha</label>
+                    <input type="password" id="login-password" placeholder="Digite sua senha" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <button type="button" onclick="fazerLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/25 active:scale-98 flex items-center justify-center gap-2">
+                    Entrar no Sistema
+                </button>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 text-center">
+                <p class="text-[10px] text-slate-500 font-mono">🔒 Acesso Seguro Autorizado (Supabase Cloud)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÁREA PROTEGIDA (APP PRINCIPAL) -->
+    <div id="screen-app" class="hidden flex-1 flex flex-col">
+        <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🖨️</span>
+                    <div>
+                        <h1 class="text-base font-bold text-white leading-none">3D Control</h1>
+                        <span class="text-[10px] text-slate-400">Painel Operacional</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span id="user-display" class="text-xs text-slate-400 font-mono bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700"></span>
+                    <button onclick="fazerLogout()" class="text-xs font-semibold text-slate-400 hover:text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition border border-transparent">
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <header class="p-4 md:p-6 max-w-7xl mx-auto w-full">
+            <div class="p-6 rounded-3xl glass-card border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-2xl">
+                <div>
+                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Módulo 1 • Operacional
+                    </span>
+                    <h2 class="text-2xl font-extrabold text-white tracking-tight mt-1">Gestão de Pedidos</h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="total-pedidos-text">Carregando fila...</p>
+                </div>
+                
+                <button onclick="abrirModalNovoPedido()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold px-6 py-3 rounded-2xl text-sm transition shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 active:scale-95">
+                    + Novo Pedido
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full pt-0 overflow-x-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 min-w-[300px]">
+                
+                <!-- 1. NOVO PEDIDO -->
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Novo Pedido
+                        </span>
+                        <span id="count-novo" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                    </div>
+                    <div id="coluna-novo" class="flex flex-col gap-3 flex-1"></div>
+                </div>
+
+                <!-- 2. EM PRODUÇÃO -->
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Em Produção
+                        </span>
+                        <span id="count-producao" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                    </div>
+                    <div id="coluna-producao" class="flex flex-col gap-3 flex-1"></div>
+                </div>
+
+                <!-- 3. ACABAMENTO / EMBALAGEM -->
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-500"></span> Acabamento / Embalagem
+                        </span>
+                        <span id="count-embalagem" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                    </div>
+                    <div id="coluna-embalagem" class="flex flex-col gap-3 flex-1"></div>
+                </div>
+
+                <!-- 4. AGUARDANDO ENVIO -->
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span> Aguardando Envio
+                        </span>
+                        <span id="count-envio" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                    </div>
+                    <div id="coluna-envio" class="flex flex-col gap-3 flex-1"></div>
+                </div>
+
+                <!-- 5. CONCLUÍDO -->
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Concluído
+                        </span>
+                        <span id="count-concluido" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                    </div>
+                    <div id="coluna-concluido" class="flex flex-col gap-3 flex-1"></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DE NOVO PEDIDO -->
+    <div id="modal-novo-pedido" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">🛍️ Cadastrar Novo Pedido</h3>
+                <button onclick="fecharModalNovoPedido()" class="text-slate-400 hover:text-white text-xl">✕</button>
+            </div>
+
+            <form onsubmit="salvarNovoPedido(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Canal de Venda *</label>
+                    <select id="input-origem" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                        <option value="Shopee">🟠 Shopee</option>
+                        <option value="Mercado Livre">🟡 Mercado Livre</option>
+                        <option value="Site Próprio">🌐 Site Próprio</option>
+                        <option value="WhatsApp">🟢 WhatsApp / Venda Direta</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Selecione o Produto (Catálogo) *</label>
+                    <select id="input-produto-sku" onchange="autoPreencherProduto()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                        <option value="">-- Escolha um Produto --</option>
+                        <option value="PRD-001">#PRD-001 - Suporte Headset PS5</option>
+                        <option value="PRD-002">#PRD-002 - Vasinho Decorativo LowPoly</option>
+                        <option value="PRD-003">#PRD-003 - Base Action Figure Diorama</option>
+                        <option value="PRD-004">#PRD-004 - Engrenagem Personalizada</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Cliente *</label>
+                        <input type="text" id="input-cliente" required placeholder="Ex: Ana Maria" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Código do Pedido</label>
+                        <input type="text" id="input-codigo" placeholder="Ex: #SHP-9821" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Total (R$) *</label>
+                    <input type="number" step="0.01" id="input-valor" required placeholder="45.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="fecharModalNovoPedido()" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs">Salvar Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONTROLE E CONEXÃO SUPABASE -->
+    <script>
+        const SUPABASE_URL = "https://rqiixcmcpjkrmezvjzbg.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxaWl4Y21jcGprcm1lenZqemJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MzgxNjQsImV4cCI6MjEwNDExNDE2NH0.NYRGpu3PhdJnLhJeDDB6N0WUg8sQKwk1NCIsxreKqzY";
+
+        let supabaseClient = null;
+        if (window.supabase && SUPABASE_URL) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        const catalogoProdutos = {
+            'PRD-001': { sku: 'PRD-001', nome: 'Suporte Headset PS5', insumo: 'PLA Preto (120g)', valorBase: 45.00, foto: '🎧' },
+            'PRD-002': { sku: 'PRD-002', nome: 'Vasinho Decorativo LowPoly', insumo: 'PETG Vermelho (85g)', valorBase: 68.00, foto: '🪴' },
+            'PRD-003': { sku: 'PRD-003', nome: 'Base Action Figure Diorama', insumo: 'PLA Branco (210g)', valorBase: 120.00, foto: '🏰' },
+            'PRD-004': { sku: 'PRD-004', nome: 'Engrenagem Personalizada', insumo: 'ABS Cinza (50g)', valorBase: 35.00, foto: '⚙️' }
+        };
+
+        let pedidos = [];
+
+        window.onload = function() {
+            if (localStorage.getItem('3dcontrol_logado') === 'true') {
+                const emailSalvo = localStorage.getItem('3dcontrol_email') || 'renato.rustiguelli@gmail.com';
+                exibirApp(emailSalvo);
+            }
+        };
+
+        async function fazerLogin() {
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const senha = document.getElementById('login-password').value;
+            const errorBox = document.getElementById('login-error');
+
+            errorBox.classList.add('hidden');
+
+            if (!email || !senha) {
+                errorBox.innerText = "Por favor, preencha o e-mail e a senha.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            // Lista de e-mails administrativos autorizados
+            const adminsAutorizados = ['renato.rustiguelli@gmail.com', 'gaheustaquio@gmail.com'];
+
+            if (!adminsAutorizados.includes(email)) {
+                errorBox.innerText = "E-mail não autorizado para acesso administrativo.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
+                if (error) {
+                    errorBox.innerText = "E-mail ou senha incorretos no Supabase.";
+                    errorBox.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            localStorage.setItem('3dcontrol_logado', 'true');
+            localStorage.setItem('3dcontrol_email', email);
+            exibirApp(email);
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('3dcontrol_logado');
+            localStorage.removeItem('3dcontrol_email');
+            if (supabaseClient) supabaseClient.auth.signOut();
+            document.getElementById('screen-app').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+        }
+
+        function exibirApp(email) {
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-app').classList.remove('hidden');
+            document.getElementById('user-display').innerText = email;
+            carregarPedidos();
+        }
+
+        async function carregarPedidos() {
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient.from('pedidos').select('*').order('created_at', { ascending: false });
+                if (!error && data) {
+                    pedidos = data;
+                    renderizarKanban();
+                    return;
+                }
+            }
+            
+            // Fallback LocalStorage caso offline
+            const salvos = localStorage.getItem('3dcontrol_pedidos');
+            if (salvos) {
+                pedidos = JSON.parse(salvos);
+            } else {
+                pedidos = [
+                    { id: 1, origem: 'Mercado Livre', codigo: '#ML-10492', sku: 'PRD-002', produto: 'Vasinho Decorativo LowPoly', cliente: 'Carlos Eduardo', insumo: 'PETG Vermelho (85g)', valor: 68.00, status: 'novo', foto: '🪴' },
+                    { id: 2, origem: 'Shopee', codigo: '#SHP-9821', sku: 'PRD-001', produto: 'Suporte Headset PS5', cliente: 'Ana Maria', insumo: 'PLA Preto (120g)', valor: 45.00, status: 'producao', foto: '🎧' },
+                    { id: 3, origem: 'Site Próprio', codigo: '#WEB-3021', sku: 'PRD-003', produto: 'Base Action Figure Diorama', cliente: 'Marcos Paulo', insumo: 'PLA Branco (210g)', valor: 120.00, status: 'embalagem', foto: '🏰' },
+                    { id: 4, origem: 'WhatsApp', codigo: '#WTS-0042', sku: 'PRD-004', produto: 'Engrenagem Personalizada', cliente: 'Oficina Mecânica', insumo: 'ABS Cinza (50g)', valor: 35.00, status: 'envio', foto: '⚙️' }
+                ];
+                salvarPedidosLocal();
+            }
+            renderizarKanban();
+        }
+
+        function salvarPedidosLocal() {
+            localStorage.setItem('3dcontrol_pedidos', JSON.stringify(pedidos));
+        }
+
+        function renderizarKanban() {
+            const colunas = ['novo', 'producao', 'embalagem', 'envio', 'concluido'];
+            colunas.forEach(c => document.getElementById('coluna-' + c).innerHTML = '');
+
+            let contadores = { novo: 0, producao: 0, embalagem: 0, envio: 0, concluido: 0 };
+
+            pedidos.forEach(p => {
+                if (contadores[p.status] !== undefined) contadores[p.status]++;
+                const cardHTML = criarCardHTML(p);
+                const target = document.getElementById(`coluna-${p.status}`);
+                if (target) target.innerHTML += cardHTML;
+            });
+
+            colunas.forEach(c => document.getElementById('count-' + c).innerText = contadores[c]);
+            document.getElementById('total-pedidos-text').innerText = `${pedidos.length} pedidos ativos na fila de produção`;
+        }
+
+        function criarCardHTML(p) {
+            const estilosOrigem = {
+                'Shopee': { bg: 'bg-shopee', text: 'text-white' },
+                'Mercado Livre': { bg: 'bg-amber-400', text: 'text-black' },
+                'Site Próprio': { bg: 'bg-site', text: 'text-white' },
+                'WhatsApp': { bg: 'bg-wts', text: 'text-black' }
+            };
+
+            const estilo = estilosOrigem[p.origem] || { bg: 'bg-slate-700', text: 'text-white' };
+            
+            let proximoStatus = '';
+            let textoBotao = '';
+            if(p.status === 'novo') { proximoStatus = 'producao'; textoBotao = 'Imprimir ➔'; }
+            else if(p.status === 'producao') { proximoStatus = 'embalagem'; textoBotao = 'Acabamento ➔'; }
+            else if(p.status === 'embalagem') { proximoStatus = 'envio'; textoBotao = 'Aguardar Envio ➔'; }
+            else if(p.status === 'envio') { proximoStatus = 'concluido'; textoBotao = 'Enviar ➔'; }
+
+            return `
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-md hover:border-indigo-500/50 transition flex flex-col justify-between gap-3">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded ${estilo.bg} ${estilo.text}">${p.origem}</span>
+                            <span class="text-xs text-slate-400 font-mono">${p.codigo || '#PEDIDO'}</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 my-1">
+                            <div class="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-xl shrink-0">
+                                ${p.foto || '📦'}
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-indigo-400 font-mono block">${p.sku || 'SKU'}</span>
+                                <h4 class="font-bold text-slate-100 text-sm leading-tight">${p.produto}</h4>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-400 mt-1">Cliente: <span class="text-slate-300 font-medium">${p.cliente}</span></p>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800 flex flex-col gap-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-100 font-bold">R$ ${Number(p.valor).toFixed(2)}</span>
+                            <span class="text-slate-400 text-[11px] font-medium">${p.insumo || ''}</span>
+                        </div>
+
+                        ${proximoStatus ? `
+                            <button onclick="avancarStatus('${p.id}', '${proximoStatus}')" class="w-full mt-1 bg-slate-800 hover:bg-indigo-600 text-slate-200 hover:text-white text-[11px] font-bold py-1.5 rounded-lg transition text-center">
+                                ${textoBotao}
+                            </button>
+                        ` : `
+                            <span class="text-[10px] text-emerald-400 font-bold text-center block pt-1">✓ Pedido Finalizado</span>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function avancarStatus(id, novoStatus) {
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('pedidos').update({ status: novoStatus }).eq('id', id);
+                if (!error) {
+                    await carregarPedidos();
+                    return;
+                }
+            }
+            const p = pedidos.find(item => item.id == id);
+            if (p) p.status = novoStatus;
+            salvarPedidosLocal();
+            renderizarKanban();
+        }
+
+        function autoPreencherProduto() {
+            const sku = document.getElementById('input-produto-sku').value;
+            if (sku && catalogoProdutos[sku]) {
+                document.getElementById('input-valor').value = catalogoProdutos[sku].valorBase.toFixed(2);
+            }
+        }
+
+        function abrirModalNovoPedido() {
+            document.getElementById('modal-novo-pedido').classList.remove('hidden');
+        }
+
+        function fecharModalNovoPedido() {
+            document.getElementById('modal-novo-pedido').classList.add('hidden');
+        }
+
+        async function salvarNovoPedido(event) {
+            event.preventDefault();
+            const sku = document.getElementById('input-produto-sku').value;
+            const prod = catalogoProdutos[sku] || { nome: 'Produto Personalizado', insumo: 'PLA Standard', foto: '📦' };
+
+            const novo = {
+                id: Date.now(),
+                origem: document.getElementById('input-origem').value,
+                sku: sku,
+                produto: prod.nome,
+                foto: prod.foto,
+                insumo: prod.insumo,
+                cliente: document.getElementById('input-cliente').value,
+                codigo: document.getElementById('input-codigo').value || `#PED-${Math.floor(Math.random() * 9000 + 1000)}`,
+                valor: parseFloat(document.getElementById('input-valor').value),
+                status: 'novo'
+            };
+
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('pedidos').insert([novo]);
+                if (!error) {
+                    await carregarPedidos();
+                    fecharModalNovoPedido();
+                    return;
+                }
+            }
+
+            pedidos.unshift(novo);
+            salvarPedidosLocal();
+            renderizarKanban();
+            fecharModalNovoPedido();
+        }
+    </script>
+</body>
+</html>
