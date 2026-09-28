@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Control - Gestão de Impressão 3D</title>
+    <title>Ilumy3D - Gestão de Impressão 3D</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client library -->
@@ -39,16 +39,20 @@
 
     <!-- TELA DE LOGIN -->
     <div id="screen-login" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
-        <div class="w-full max-w-md p-8 rounded-3xl glass-card shadow-2xl border border-slate-800 space-y-6">
-            <div class="text-center space-y-2">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 mb-2">
-                    <span class="text-3xl">🖨️</span>
+        <div class="w-full max-w-md p-8 rounded-3xl glass-card shadow-2xl border border-slate-800 space-y-6 flex flex-col items-center">
+            <div class="text-center space-y-3 w-full flex flex-col items-center">
+                <!-- Ícone 3D Moderno em Vetor SVG -->
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 shadow-lg shadow-indigo-500/30">
+                    <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021-16z"></path>
+                        <polyline stroke-linecap="round" stroke-linejoin="round" points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line stroke-linecap="round" stroke-linejoin="round" x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
                 </div>
-                <h1 class="text-2xl font-black text-white tracking-tight">3D Control</h1>
-                <p class="text-xs text-slate-400">Gerenciador do Empreendimento 3D</p>
+                <h1 class="text-3xl font-black text-white tracking-tight pt-1">Ilumy3D</h1>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 w-full">
                 <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold text-center"></div>
 
                 <div>
@@ -65,10 +69,6 @@
                     Entrar no Sistema
                 </button>
             </div>
-
-            <div class="pt-2 border-t border-slate-800 text-center">
-                <p class="text-[10px] text-slate-500 font-mono">🔒 Acesso Seguro Autorizado (Supabase Cloud)</p>
-            </div>
         </div>
     </div>
 
@@ -77,9 +77,15 @@
         <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl">🖨️</span>
+                    <div class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-md shadow-indigo-500/20">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021-16z"></path>
+                            <polyline stroke-linecap="round" stroke-linejoin="round" points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line stroke-linecap="round" stroke-linejoin="round" x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
                     <div>
-                        <h1 class="text-base font-bold text-white leading-none">3D Control</h1>
+                        <h1 class="text-base font-bold text-white leading-none">Ilumy3D</h1>
                         <span class="text-[10px] text-slate-400">Painel Operacional</span>
                     </div>
                 </div>
