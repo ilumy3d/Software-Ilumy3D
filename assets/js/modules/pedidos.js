@@ -1,3 +1,7 @@
+// ==========================================
+// MÓDULO DE GESTÃO DE PEDIDOS (KANBAN - ILUMY3D)
+// ==========================================
+
 const catalogoProdutos = {
     'PRD-001': { sku: 'PRD-001', nome: 'Suporte Headset PS5', insumo: 'PLA Preto (120g)', valorBase: 45.00, foto: '🎧' },
     'PRD-002': { sku: 'PRD-002', nome: 'Vasinho Decorativo LowPoly', insumo: 'PETG Vermelho (85g)', valorBase: 68.00, foto: '🪴' },
@@ -7,66 +11,8 @@ const catalogoProdutos = {
 
 let pedidos = [];
 
-window.onload = function() {
-    if (localStorage.getItem('3dcontrol_logado') === 'true') {
-        const emailSalvo = localStorage.getItem('3dcontrol_email') || 'renato.rustiguelli@gmail.com';
-        exibirApp(emailSalvo);
-    }
-};
-
-async function fazerLogin() {
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    const senha = document.getElementById('login-password').value;
-    const errorBox = document.getElementById('login-error');
-
-    errorBox.classList.add('hidden');
-
-    if (!email || !senha) {
-        errorBox.innerText = "Por favor, preencha o e-mail e a senha.";
-        errorBox.classList.remove('hidden');
-        return;
-    }
-
-    const adminsAutorizados = ['renato.rustiguelli@gmail.com', 'gaheustaquio@gmail.com'];
-
-    if (!adminsAutorizados.includes(email)) {
-        errorBox.innerText = "E-mail não autorizado para acesso administrativo.";
-        errorBox.classList.remove('hidden');
-        return;
-    }
-
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
-        if (error) {
-            errorBox.innerText = "E-mail ou senha incorretos no Supabase.";
-            errorBox.classList.remove('hidden');
-            return;
-        }
-    }
-
-    localStorage.setItem('3dcontrol_logado', 'true');
-    localStorage.setItem('3dcontrol_email', email);
-    exibirApp(email);
-}
-
-function fazerLogout() {
-    localStorage.removeItem('3dcontrol_logado');
-    localStorage.removeItem('3dcontrol_email');
-    if (supabaseClient) supabaseClient.auth.signOut();
-    document.getElementById('screen-app').classList.add('hidden');
-    document.getElementById('screen-login').classList.remove('hidden');
-    document.getElementById('login-password').value = '';
-}
-
-function exibirApp(email) {
-    document.getElementById('screen-login').classList.add('hidden');
-    document.getElementById('screen-app').classList.remove('hidden');
-    document.getElementById('user-display').innerText = email;
-    carregarPedidos();
-}
-
 async function carregarPedidos() {
-    if (supabaseClient) {
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
         const { data, error } = await supabaseClient.from('pedidos').select('*').order('created_at', { ascending: false });
         if (!error && data) {
             pedidos = data;
@@ -96,7 +42,10 @@ function salvarPedidosLocal() {
 
 function renderizarKanban() {
     const colunas = ['novo', 'producao', 'embalagem', 'envio', 'concluido'];
-    colunas.forEach(c => document.getElementById('coluna-' + c).innerHTML = '');
+    colunas.forEach(c => {
+        const el = document.getElementById('coluna-' + c);
+        if (el) el.innerHTML = '';
+    });
 
     let contadores = { novo: 0, producao: 0, embalagem: 0, envio: 0, concluido: 0 };
 
@@ -107,8 +56,13 @@ function renderizarKanban() {
         if (target) target.innerHTML += cardHTML;
     });
 
-    colunas.forEach(c => document.getElementById('count-' + c).innerText = contadores[c]);
-    document.getElementById('total-pedidos-text').innerText = `${pedidos.length} pedidos ativos na fila de produção`;
+    colunas.forEach(c => {
+        const elCount = document.getElementById('count-' + c);
+        if (elCount) elCount.innerText = contadores[c];
+    });
+
+    const elTotal = document.getElementById('total-pedidos-text');
+    if (elTotal) elTotal.innerText = `${pedidos.length} pedidos ativos na fila de produção`;
 }
 
 function criarCardHTML(p) {
@@ -168,7 +122,7 @@ function criarCardHTML(p) {
 }
 
 async function avancarStatus(id, novoStatus) {
-    if (supabaseClient) {
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
         const { error } = await supabaseClient.from('pedidos').update({ status: novoStatus }).eq('id', id);
         if (!error) {
             await carregarPedidos();
@@ -214,7 +168,7 @@ async function salvarNovoPedido(event) {
         status: 'novo'
     };
 
-    if (supabaseClient) {
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
         const { error } = await supabaseClient.from('pedidos').insert([novo]);
         if (!error) {
             await carregarPedidos();
