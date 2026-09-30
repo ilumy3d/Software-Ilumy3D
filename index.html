@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ilumy3D - Gestão de Impressão 3D</title>
+    <title>ILY - Sistema de Gestão</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client library -->
@@ -31,7 +31,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .kanban-column {
-            min-height: calc(100vh - 220px);
+            min-height: calc(100vh - 150px);
         }
     </style>
 </head>
@@ -41,7 +41,7 @@
     <div id="screen-login" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
         <div class="w-full max-w-md p-8 rounded-3xl glass-card shadow-2xl border border-slate-800 space-y-6 flex flex-col items-center">
             <div class="text-center space-y-3 w-full flex flex-col items-center">
-                <!-- Ícone 3D Moderno em Vetor SVG -->
+                <!-- Ícone Moderno -->
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 shadow-lg shadow-indigo-500/30">
                     <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021-16z"></path>
@@ -49,7 +49,7 @@
                         <line stroke-linecap="round" stroke-linejoin="round" x1="12" y1="22.08" x2="12" y2="12"></line>
                     </svg>
                 </div>
-                <h1 class="text-3xl font-black text-white tracking-tight pt-1">Ilumy3D</h1>
+                <h1 class="text-3xl font-black text-white tracking-tight pt-1">ILY</h1>
             </div>
 
             <form onsubmit="fazerLogin(event); return false;" class="space-y-4 w-full">
@@ -73,120 +73,189 @@
     </div>
 
     <!-- ÁREA PROTEGIDA (APP PRINCIPAL) -->
-    <div id="screen-app" class="hidden flex-1 flex flex-col">
-        <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-md shadow-indigo-500/20">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <div id="screen-app" class="hidden flex-1 flex flex-col min-h-screen">
+        
+        <!-- BARRA SUPERIOR FIXA -->
+        <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 py-1.5">
+            <div class="max-w-[1920px] mx-auto px-6 h-10 flex items-center justify-between relative">
+                
+                <div class="w-36 hidden md:block"></div>
+
+                <!-- LOGO + NOME ILY CENTRALIZADOS -->
+                <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+                    <div class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 shadow-md shadow-indigo-500/20">
+                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021-16z"></path>
                             <polyline stroke-linecap="round" stroke-linejoin="round" points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                             <line stroke-linecap="round" stroke-linejoin="round" x1="12" y1="22.08" x2="12" y2="12"></line>
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="text-base font-bold text-white leading-none">Ilumy3D</h1>
-                        <span class="text-[10px] text-slate-400">Painel Operacional</span>
-                    </div>
+                    <h1 class="text-base font-black text-white tracking-tight">ILY</h1>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <span id="user-display" class="text-xs text-slate-400 font-mono bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700"></span>
-                    <button onclick="fazerLogout()" class="text-xs font-semibold text-slate-400 hover:text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition border border-transparent">
+                <!-- USUÁRIO E BOTÃO SAIR -->
+                <div class="flex items-center gap-2.5 ml-auto">
+                    <span id="user-display" class="text-[11px] text-slate-400 font-mono bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60"></span>
+                    <button onclick="fazerLogout()" class="text-[11px] font-semibold text-slate-400 hover:text-red-400 px-2 py-1 rounded-md hover:bg-red-500/10 transition border border-transparent">
                         Sair
                     </button>
                 </div>
             </div>
         </nav>
 
-        <header class="p-4 md:p-6 max-w-7xl mx-auto w-full">
-            <div class="p-6 rounded-3xl glass-card border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-2xl">
-                <div>
-                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Módulo 1 • Operacional
-                    </span>
-                    <h2 class="text-2xl font-extrabold text-white tracking-tight mt-1">Gestão de Pedidos</h2>
-                    <p class="text-xs text-slate-400 mt-0.5" id="total-pedidos-text">Carregando fila...</p>
-                </div>
+        <!-- LAYOUT COM MENU LATERAL E CONTEÚDO EXPANDIDO -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- MENU LATERAL ESQUERDO COMPACTO -->
+            <aside class="w-48 bg-slate-900/60 border-r border-slate-800 p-3 flex flex-col gap-1.5 shrink-0">
+                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-2 mb-1">Módulos</span>
                 
-                <button onclick="abrirModalNovoPedido()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold px-6 py-3 rounded-2xl text-sm transition shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 active:scale-95">
-                    + Novo Pedido
+                <button id="nav-pedidos" onclick="trocarAba('pedidos')" class="w-full flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                    <span class="text-sm">📋</span> Gestão de Pedidos
                 </button>
-            </div>
-        </header>
 
-        <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full pt-0 overflow-x-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 min-w-[300px]">
+                <button id="nav-catalogo" onclick="trocarAba('catalogo')" class="w-full flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <span class="text-sm">📦</span> Catálogo Produtos
+                </button>
+
+                <button id="nav-estoque" onclick="trocarAba('estoque')" class="w-full flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <span class="text-sm">🧵</span> Estoque Filamentos
+                </button>
+
+                <button id="nav-financas" onclick="trocarAba('financas')" class="w-full flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <span class="text-sm">📊</span> Finanças & DRE
+                </button>
+            </aside>
+
+            <!-- PAINEL CENTRAL / CONTEÚDO EXPANDIDO -->
+            <main class="flex-1 p-4 md:p-6 overflow-y-auto w-full">
                 
-                <!-- 1. NOVO PEDIDO -->
-                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Novo Pedido
-                        </span>
-                        <span id="count-novo" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                <!-- ABA 1: GESTÃO DE PEDIDOS (KANBAN) -->
+                <div id="aba-pedidos" class="space-y-4 max-w-[1600px] mx-auto">
+                    
+                    <!-- BARRA COMPACTA POSICIONADA À ESQUERDA -->
+                    <div class="flex justify-start my-1">
+                        <div class="inline-flex items-center gap-3.5 bg-slate-900/80 p-1.5 px-3.5 rounded-2xl border border-slate-800 shadow-lg backdrop-blur-md">
+                            <button onclick="abrirModalNovoPedido()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center gap-1.5">
+                                + Novo Pedido
+                            </button>
+
+                            <div class="h-3.5 w-[1px] bg-slate-800"></div>
+
+                            <span class="text-xs text-slate-300 font-medium flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="total-pedidos-text">Carregando fila...</span>
+                            </span>
+                        </div>
                     </div>
-                    <div id="coluna-novo" class="flex flex-col gap-3 flex-1"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <!-- 1. NOVO PEDIDO -->
+                        <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Novo Pedido
+                                </span>
+                                <span id="count-novo" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                            </div>
+                            <div id="coluna-novo" class="flex flex-col gap-3 flex-1"></div>
+                        </div>
+
+                        <!-- 2. EM PRODUÇÃO -->
+                        <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> Em Produção
+                                </span>
+                                <span id="count-producao" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                            </div>
+                            <div id="coluna-producao" class="flex flex-col gap-3 flex-1"></div>
+                        </div>
+
+                        <!-- 3. ACABAMENTO / EMBALAGEM -->
+                        <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-orange-500"></span> Acabamento / Embalagem
+                                </span>
+                                <span id="count-embalagem" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                            </div>
+                            <div id="coluna-embalagem" class="flex flex-col gap-3 flex-1"></div>
+                        </div>
+
+                        <!-- 4. AGUARDANDO ENVIO -->
+                        <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> Aguardando Envio
+                                </span>
+                                <span id="count-envio" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                            </div>
+                            <div id="coluna-envio" class="flex flex-col gap-3 flex-1"></div>
+                        </div>
+
+                        <!-- 5. CONCLUÍDO -->
+                        <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Concluído
+                                </span>
+                                <span id="count-concluido" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                            </div>
+                            <div id="coluna-concluido" class="flex flex-col gap-3 flex-1"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 2. EM PRODUÇÃO -->
-                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Em Produção
-                        </span>
-                        <span id="count-producao" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
+                <!-- ABA 2: CATÁLOGO DE PRODUTOS -->
+                <div id="aba-catalogo" class="hidden space-y-4 max-w-[1600px] mx-auto">
+                    <div class="flex justify-start my-1">
+                        <div class="inline-flex items-center gap-3.5 bg-slate-900/80 p-1.5 px-3.5 rounded-2xl border border-slate-800 shadow-lg backdrop-blur-md">
+                            <button onclick="alert('Cadastro de novos SKUs em desenvolvimento!')" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center gap-1.5">
+                                + Novo Produto SKU
+                            </button>
+
+                            <div class="h-3.5 w-[1px] bg-slate-800"></div>
+
+                            <span class="text-xs text-slate-300 font-medium flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                <span>4 SKUs Cadastrados</span>
+                            </span>
+                        </div>
                     </div>
-                    <div id="coluna-producao" class="flex flex-col gap-3 flex-1"></div>
+
+                    <div id="tabela-catalogo-container" class="bg-slate-900/50 rounded-2xl border border-slate-800 p-4 overflow-x-auto">
+                        <!-- Tabela renderizada via JS -->
+                    </div>
                 </div>
 
-                <!-- 3. ACABAMENTO / EMBALAGEM -->
-                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-orange-500"></span> Acabamento / Embalagem
-                        </span>
-                        <span id="count-embalagem" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
-                    </div>
-                    <div id="coluna-embalagem" class="flex flex-col gap-3 flex-1"></div>
+                <!-- ABA 3: ESTOQUE DE FILAMENTOS -->
+                <div id="aba-estoque" class="hidden min-h-[60vh] flex flex-col items-center justify-center text-center p-8 border border-dashed border-slate-800 rounded-3xl bg-slate-900/20 space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center text-3xl">🧵</div>
+                    <h3 class="text-xl font-bold text-white">Módulo de Estoque de Filamentos</h3>
+                    <p class="text-xs text-slate-400 max-w-md">Tela em construção. Aqui você poderá controlar os carretéis de PLA, PETG, ABS, peso restante e alertas de estoque baixo.</p>
                 </div>
 
-                <!-- 4. AGUARDANDO ENVIO -->
-                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-purple-500"></span> Aguardando Envio
-                        </span>
-                        <span id="count-envio" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
-                    </div>
-                    <div id="coluna-envio" class="flex flex-col gap-3 flex-1"></div>
+                <!-- ABA 4: FINANÇAS & DRE -->
+                <div id="aba-financas" class="hidden min-h-[60vh] flex flex-col items-center justify-center text-center p-8 border border-dashed border-slate-800 rounded-3xl bg-slate-900/20 space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-3xl">📊</div>
+                    <h3 class="text-xl font-bold text-white">Módulo de Finanças & DRE</h3>
+                    <p class="text-xs text-slate-400 max-w-md">Tela em construção. Aqui você terá o balanço de faturamento, margem de contribuição, custos fixos/variáveis e o Lucro Líquido Real.</p>
                 </div>
 
-                <!-- 5. CONCLUÍDO -->
-                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 kanban-column">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Concluído
-                        </span>
-                        <span id="count-concluido" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">0</span>
-                    </div>
-                    <div id="coluna-concluido" class="flex flex-col gap-3 flex-1"></div>
-                </div>
-
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- MODAL DE NOVO PEDIDO -->
+    <!-- MODAL DE CADASTRAR / EDITAR PEDIDO -->
     <div id="modal-novo-pedido" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">🛍️ Cadastrar Novo Pedido</h3>
+                <h3 id="modal-titulo" class="text-lg font-bold text-white flex items-center gap-2">🛍️ Cadastrar Novo Pedido</h3>
                 <button onclick="fecharModalNovoPedido()" class="text-slate-400 hover:text-white text-xl">✕</button>
             </div>
 
-            <form onsubmit="salvarNovoPedido(event)" class="space-y-4">
+            <form id="form-pedido" onsubmit="salvarNovoPedido(event)" class="space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Canal de Venda *</label>
                     <select id="input-origem" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
@@ -219,9 +288,31 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Total (R$) *</label>
+                        <input type="number" step="0.01" id="input-valor" required placeholder="45.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Filamento / Cor</label>
+                        <input type="text" id="input-insumo" placeholder="Ex: PLA Preto Matte" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Prazo de Envio</label>
+                        <input type="date" id="input-prazo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Código de Rastreio</label>
+                        <input type="text" id="input-rastreio" placeholder="Ex: BR123456789" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Total (R$) *</label>
-                    <input type="number" step="0.01" id="input-valor" required placeholder="45.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Observações / Especificações</label>
+                    <textarea id="input-obs" rows="2" placeholder="Ex: Troca de cor na camada 42, embalagem reforçada" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
@@ -232,7 +323,7 @@
         </div>
     </div>
 
-    <!-- CARREGAMENTO DOS MÓDULOS DE JAVASCRIPT ORGANIZADOS -->
+    <!-- CARREGAMENTO DOS MÓDULOS JS -->
     <script src="assets/js/modules/auth.js"></script>
     <script src="assets/js/modules/pedidos.js"></script>
 </body>
